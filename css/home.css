@@ -1,0 +1,294 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    width: 70%;
+    margin: auto;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+/* header */
+.box {
+    background-color: rgb(255, 255, 255);
+    width: 100%;
+    height: 120px;
+    padding: 20px;
+    align-items: center;
+    position: relative;
+}
+
+header {
+    background-color: rgb(255, 185, 115);
+    color: #fff;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    position: fixed;
+    z-index: 100;
+    margin: 0 auto; /* 가운데 정렬 */
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin: 0 10px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 5px 10px;
+    font-weight: bold;
+    position: relative;
+    background-image: linear-gradient(transparent calc(100% - 3px), #fff 3px);
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+    transition: background-size 0.8s;
+}
+
+nav ul li a:hover {
+    background-size: 100% 100%;
+}
+
+@media (min-width: 1000px) {
+    nav ul li a {
+        font-size: 1.5em;
+    }
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.nav-right {
+    margin-left: auto;
+    margin-right: 40px;
+}
+
+/* 메인 컨텐츠 요소 */
+/* 사진 */
+.carousel {
+    position: relative;
+    height: 500px;
+    overflow: hidden;
+    margin: auto; /* 헤더와의 간격을 위한 마진 추가 */
+}
+
+.carousel-inner {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-item {
+    min-width: 100%;
+    transition: transform 0.5s ease-in-out;
+    object-fit: cover; /* 이미지 비율에 맞게 자름 */
+    height: 500px;
+}
+
+.carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.carousel-control.prev {
+    left: 0;
+}
+
+.carousel-control.next {
+    right: 0;
+}
+
+.carousel-text {
+    position: absolute;
+    top: 50%;
+    left: 25%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: left;
+    z-index: 1; /* 이미지 위에 텍스트를 표시하기 위해 높은 z-index 설정 */
+}
+
+.bold {
+    font-size: 50px;
+    margin-bottom: 5px; /* bold와 normal 텍스트 사이의 간격 조정 */
+}
+
+.normal {
+    font-size: 30px;
+    margin-top: 0; /* 불필요한 상단 여백 제거 */
+}
+
+/* 메인 컨텐츠 */
+.main-content {
+    display: flex; /* flexbox로 설정 */
+    justify-content: space-between; /* 요소 간의 간격을 균일하게 분배 */
+    margin-top: 20px;
+}
+
+/* 프리뷰 요소 */
+.orangeline {
+    border: none; /* 기본 경계 제거 */
+    height: 3px; /* 선의 두께 설정 */
+    background-color: rgb(255, 128, 0, 0.5); /* 원하는 색상으로 배경색 설정 */
+}
+.pre {
+    text-decoration: none;
+}
+.pre:visited, .pre:link{
+    color: black;
+}
+.pre:active {
+    color: rgb(255, 128, 0, 0.5);
+}
+/* 입양 */
+.pre-adopt {
+    width: 49%; 
+    font-size: 30px;
+}
+
+.pre-adopt-title {
+    margin-bottom: 10px;
+}
+
+.image-container-wrapper {
+    display: flex; /* flexbox로 설정 */
+    flex-wrap: wrap; /* 줄 바꿈을 허용 */
+    justify-content: space-between; /* 요소 간의 간격을 균일하게 분배 */
+}
+
+.image-container {
+    position: relative;
+    width: 30%; /* 각 이미지 컨테이너의 너비를 30%로 설정 */
+    margin-bottom: 20px; /* 요소 간의 간격을 일정하게 하기 위해 마진 추가 */
+    box-sizing: border-box; /* 마진과 패딩을 포함하여 크기 계산 */
+    overflow: hidden; /* 자식 요소가 부모 요소를 벗어나지 않도록 설정 */
+}
+
+.image-container img {
+    width: 100%; /* 부모 컨테이너의 너비에 맞게 이미지 크기 설정 */
+    display: block; /* 이미지 하단 여백 제거 */
+    transition: opacity 0.5s ease; /* 부드러운 전환 효과 추가 */
+}
+
+.overlay-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 추가 */
+    padding: 10px;
+    font-size: 20px; /* 원하는 글꼴 크기 설정 */
+    text-align: center;
+    width: 100%; /* 텍스트 박스를 이미지 너비에 맞게 설정 */
+    opacity: 0; /* 기본 상태에서는 보이지 않도록 설정 */
+    transition: opacity 0.5s ease; /* 부드러운 전환 효과 추가 */
+}
+
+.image-container:hover img {
+    opacity: 0.7; /* 마우스를 올릴 때 이미지가 약간 어두워짐 */
+}
+
+.image-container:hover .overlay-text {
+    opacity: 1; /* 마우스를 올릴 때 오버레이 텍스트가 보임 */
+}
+
+/* 참여 */
+.pre-board {
+    width: 49%;
+    font-size: 30px;
+}
+.pre-board-content > hr {
+    border: none; /* 기본 경계 제거 */
+    height: 1px; /* 선의 두께 설정 */
+    background-color: rgb(231, 231, 231); /* 원하는 색상으로 배경색 설정 */
+}
+
+.post-title a {
+    font-size: 20px;
+    text-decoration: none;
+}
+
+.post-title a:visited, .post-title a:link {
+    color: black;
+}
+
+.post-title a:active {
+    color: rgb(255, 128, 0, 0.5);
+}
+
+.post-body {
+    font-size: 15px;
+}
+
+/* 후원 */
+.pre-dona{
+    width: 50%;
+    font-size: 30px;
+}
+.pre-dona-box {
+    border-style: solid;
+    border-width: 2px;
+    border-color: lightgray;
+    border-radius: 10px;
+    margin-top: 20px;
+    padding-left: 20px;
+}
+.dona-bold a {
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.dona-bold a:visited, .dona-bold a:link {
+    color: black;
+}
+
+.dona-bold a:active {
+    color: rgb(255, 128, 0, 0.5);
+}
+
+.dona-normal {
+    font-size: 15px;
+} 
+
+/* footer */
+footer {
+    background-color:  rgb(255, 185, 115);
+    color: white;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+    z-index: 100; /* 다른 요소들보다 위에 위치하도록 설정 */
+}
+
+.footer-content {
+    width: 100%; /* 페이지의 너비에 맞추기 위해 동일한 너비 설정 */
+    margin: auto;
+    font-weight: bold;
+}
