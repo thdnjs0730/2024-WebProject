@@ -1,9 +1,14 @@
-# Local credentials and generated files
+target/
+build/
+.idea/
+.settings/
+.classpath
+.project
 .env
 .env.*
 !.env.example
+*.log
 *.class
-webproject/build/
-webproject/target/
+uploads/
 .DS_Store
-.idea/
+Thumbs.db

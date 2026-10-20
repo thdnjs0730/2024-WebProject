@@ -1,37 +1,82 @@
-# 반려동물 입양 웹사이트
+# 반려동물 입양 웹프로젝트
 
-반려동물 입양 공고와 회원·메시지 기능을 다루는 학교 팀 프로젝트입니다.
+학교 팀 프로젝트의 JSP·Servlet·MySQL 소스를 실행 가능한 Maven WAR 프로젝트로 정리한 버전입니다. 입양 공고, 회원가입·로그인, 회원정보 수정, 받은/보낸 쪽지, 관리자 검색·삭제를 제공합니다. 커뮤니티 영역과 후원 배너는 화면 예시입니다.
 
-## 역할
+## 빠른 실행: Docker
 
-최소원은 Java Servlet·JSP·MySQL 기반 백엔드와 DB 연동을 담당했습니다. 사용자 입력의 저장·조회 흐름을 구현한 경험을 설명하는 자료이며 금융 거래나 상용 서비스 운영 경력으로 기재하지 않습니다.
+Docker Desktop의 Linux 컨테이너 환경에서 저장소 루트를 열고 실행합니다.
 
-## 복원한 코드
+```powershell
+Copy-Item .env.example .env
+# .env의 DB_PASSWORD와 DB_ROOT_PASSWORD를 서로 다른 값으로 수정
+docker compose up --build -d
+```
 
-2026-10-20 사용자 보관 학교 ZIP에서 Java 16개와 JSP 13개를 비롯한 텍스트 소스를 webproject/ 아래에 복원했습니다. DB 접속값과 고정 관리자 비밀번호는 게시 전에 환경변수로 분리했습니다. 컴파일 산출물·라이브러리 JAR·사용자 데이터는 추가하지 않았습니다.
+브라우저에서 [http://localhost:8080](http://localhost:8080)을 엽니다. 최초 이미지 다운로드·빌드와 DB 초기화에는 시간이 걸립니다. 일반 회원은 화면에서 가입합니다. 관리자 계정이 필요하면 처음 실행하기 전에 `.env`의 `ADMIN_ID`와 `ADMIN_PASSWORD`를 지정합니다. 미설정 시 고정 관리자 계정을 만들지 않습니다.
 
-| 위치 | 내용 |
+```powershell
+docker compose logs -f web
+docker compose down
+```
+
+DB와 업로드 사진은 Docker 볼륨에 보존됩니다. `database/schema.sql`은 **새 DB를 만드는 용도**이며 기존 학교 DB에 적용하는 마이그레이션 파일이 아닙니다.
+
+## Java·Tomcat으로 실행
+
+Java 17, Maven 3.9, Tomcat 9, MySQL 8.4를 준비합니다. `javax.servlet` 프로젝트이므로 Tomcat 9를 사용합니다. [Tomcat 공식 문서](https://tomcat.apache.org/tomcat-9.0-doc/index.html)
+
+1. MySQL에 `pet_adoption` 데이터베이스를 `utf8mb4`로 만들고 전용 사용자를 생성합니다.
+2. 해당 DB에 `database/schema.sql`을 적용합니다. 예: MySQL 클라이언트에서 `USE pet_adoption;` 후 `SOURCE C:/경로/database/schema.sql;`.
+3. `mvn verify`로 Java 컴파일·통합 테스트·WAR 생성을 실행합니다. 기본 테스트는 별도 H2 메모리 DB에서 수행하므로 MySQL이 없어도 빌드를 확인할 수 있습니다.
+4. `target/pet-adoption.war`를 Tomcat의 `webapps`에 복사합니다.
+5. Tomcat을 시작하는 프로세스에 아래 환경변수를 지정한 뒤 실행하고 [http://localhost:8080/pet-adoption/](http://localhost:8080/pet-adoption/)에 접속합니다.
+
+```powershell
+$env:DB_URL='jdbc:mysql://localhost:3306/pet_adoption?characterEncoding=UTF-8&serverTimezone=Asia/Seoul'
+$env:DB_USER='pet_app'
+$env:DB_PASSWORD='직접 지정한 DB 비밀번호'
+$env:UPLOAD_DIR='C:\pet-adoption-data\uploads'
+# 관리자를 처음 만들 때만 선택적으로 지정
+$env:ADMIN_ID='your_admin'
+$env:ADMIN_PASSWORD='직접 지정한 관리자 비밀번호'
+& 'C:\apache-tomcat-9\bin\catalina.bat' run
+```
+
+`.env`는 Docker Compose가 읽습니다. Tomcat을 직접 실행할 때는 위처럼 프로세스 환경변수를 설정해야 합니다. ID는 영문·숫자·밑줄 3~32자, 비밀번호는 8자 이상이며 UTF-8 72바이트 이하입니다. 관리자 초기화는 동일 ID가 없을 때만 수행하며 기존 비밀번호를 덮어쓰지 않습니다.
+
+## 폴더 구성
+
+| 경로 | 역할 |
 | --- | --- |
-| [controller](webproject/src/main/java/com/web/controller) | 회원·입양 공고·메시지·마이페이지 요청 처리 |
-| [dao](webproject/src/main/java/com/web/dao) | PreparedStatement 기반 DB 접근 |
-| [dto](webproject/src/main/java/com/web/dto) | 요청과 DB 사이의 데이터 모델 |
-| [JdbcConnectUtil](webproject/src/main/java/com/web/common/JdbcConnectUtil.java) | 환경변수를 읽는 JDBC 연결 |
-| [JSP와 화면 자료](webproject/src/main/webapp) | 서버 렌더링 화면·CSS·JavaScript |
-| [schema.sql](webproject/database/schema.sql) | 원본 테이블 생성문. 실제 사용자 행 없음 |
+| `src/main/java/com/web/controller` | HTTP 요청 처리와 사진 응답 |
+| `src/main/java/com/web/dao` | SQL 조회·저장 |
+| `src/main/java/com/web/dto` | 회원·공고·쪽지 데이터 |
+| `src/main/java/com/web/common` | DB 설정, 비밀번호 해시, HTML 이스케이프 |
+| `src/main/java/com/web/mvc` | 인증·권한 필터와 초기 관리자 설정 |
+| `src/main/webapp/*.jsp` | 역할별 화면: `auth`, `account`, `adoption-*`, `admin`, `about` |
+| `src/main/webapp/WEB-INF/fragments` | 공통 헤더 |
+| `src/main/webapp/assets` | `css`, `js`, `images` 정적 자료 |
+| `database/schema.sql` | 새 DB 테이블과 제약조건 |
+| `src/test/java` | 실제 Tomcat 기반 HTTP 통합 테스트 |
+| `docs` | 변경·검증 기록과 기존 기획 자료 |
 
-화면 입력 → Servlet → DAO → MySQL → DTO·JSP 순서로 흐름을 살펴볼 수 있습니다. 루트의 기존 JSP·CSS·이미지·계획서는 초기 작업 자료로 보존했으며, 복원한 백엔드 기준은 webproject/입니다.
+실행 시 생성된 사진은 소스 폴더 밖의 `UPLOAD_DIR`에 저장합니다. 미지정 시 사용자 홈의 `.pet-adoption/uploads`를 사용합니다. 최대 5MB의 PNG/JPEG/GIF를 이미지로 검증한 뒤 저장하며, 글 수정 시 사진을 다시 선택하지 않으면 기존 사진을 유지합니다.
 
-## 실행 준비
+## 검증
 
-원본 Eclipse 설정은 Java 17 · Tomcat 9(Servlet 4.0) 기준입니다. Java 17·Maven·Tomcat 9·MySQL 8 환경을 준비합니다.
+```powershell
+mvn verify
+# 실제 MySQL 검증은 비어 있는 전용 테스트 DB를 준비한 뒤 실행
+$env:TEST_DB_URL='jdbc:mysql://localhost:3306/pet_adoption_test?characterEncoding=UTF-8&serverTimezone=Asia/Seoul'
+$env:TEST_DB_USER='test_user'
+$env:TEST_DB_PASSWORD='test_password'
+mvn verify
+```
 
-1. [schema.sql](webproject/database/schema.sql)을 별도 로컬 DB에 적용합니다. 이 파일은 DDL이며 실제 사용자 데이터는 없습니다.
-2. Tomcat 프로세스에 DB_URL, DB_USER, DB_PASSWORD 환경변수를 설정합니다. 예시는 [환경변수 안내](webproject/.env.example)를 참고합니다. .env 파일을 자동으로 읽지는 않습니다.
-3. webproject/에서 mvn package를 실행하고 생성 WAR를 Tomcat에 배포합니다. Maven 설정은 이번 복원에서 추가했으며 실제 빌드 검증 여부는 [복원 기록](docs/restoration.md)을 따릅니다.
-4. 관리자가 필요한 로컬 실습에만 BOOTSTRAP_ADMIN_ID와 BOOTSTRAP_ADMIN_PASSWORD를 명시합니다. 미설정 시 관리자 자동 생성은 하지 않습니다.
+테스트 DB에는 테스트 사용자·쪽지가 생성됩니다. `TEST_DB_URL`에 실제 사용자 DB를 지정하지 마세요. 매번 빈 전용 DB를 사용합니다. GitHub Actions는 MySQL 8.4와 `/pet-adoption`·루트 배포 경로를 검증합니다. 상세 결과는 [검증 기록](docs/verification.md)을 참고합니다.
 
-## 한계와 후속 작업
+## 원본과 정리 범위
 
-학교 원본에는 평문 비밀번호 비교와 짧은 비밀번호 컬럼 등 개선할 부분이 있습니다. 해시 저장·입력 검증·접근 권한·출력 이스케이프 등을 보완하기 전 운영 서비스로 사용하지 않습니다. 이번 작업은 포트폴리오용 소스 복원과 접속값 분리이며 인증 체계를 완성한 작업이 아닙니다.
+`학교 자료/웹프로젝트/webproject`를 기준으로 화면과 이미지를 복구했습니다. 원본 학교 폴더는 수정하지 않았습니다. 중복된 초기 JSP와 Eclipse 빌드 산출물은 현재 실행 소스에서 제외했으며 기존 버전은 Git 이력에 남아 있습니다. 기획 자료는 `docs/project-history`에 모았습니다.
 
-ZIP의 바이너리 이미지 전체를 새로 게시하지 않았습니다. 일부 JSP가 참조하는 이미지·SVG는 누락될 수 있습니다. 전체 화면과 DB 연동의 재현은 별도 확인이 필요합니다.
+DB 비밀번호의 소스 내 고정을 제거하고 회원 비밀번호를 BCrypt로 저장합니다. 기존 평문 비밀번호 DB를 그대로 연결하는 방식은 지원하지 않습니다. 이 버전은 새 DB로 실행합니다. 학습용 화면과 기존 디자인을 유지했으며 운영 환경의 메일 인증·비밀번호 복구·요청 제한·HTTPS 배포는 포함하지 않습니다.

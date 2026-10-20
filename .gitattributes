@@ -1,0 +1,11 @@
+* text=auto
+*.java text eol=lf
+*.jsp text eol=lf
+*.jspf text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.xml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.sql text eol=lf
+*.md text eol=lf

@@ -1,0 +1,33 @@
+name: Verify application
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        context: ["/pet-adoption", ""]
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: pet_adoption_test
+          MYSQL_ROOT_PASSWORD: integration-test-only
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pintegration-test-only"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Compile, test HTTP flows with MySQL, and package WAR
+        run: mvn -B verify -Dtest.context="${{ matrix.context }}"
+        env:
+          TEST_DB_URL: jdbc:mysql://127.0.0.1:3306/pet_adoption_test?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+          TEST_DB_USER: root
+          TEST_DB_PASSWORD: integration-test-only
