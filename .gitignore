@@ -1,0 +1,9 @@
+# Local credentials and generated files
+.env
+.env.*
+!.env.example
+*.class
+webproject/build/
+webproject/target/
+.DS_Store
+.idea/
